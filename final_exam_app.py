@@ -114,8 +114,12 @@ feature_columns = numerical_cols + [
     'Ever_Bankrupt_or_Foreclose_1'
 ]
 
-final_input = final_input.reindex(columns=feature_columns, fill_value=0)
+#final_input = final_input.reindex(columns=feature_columns, fill_value=0)
+    # Combine numerical + categorical
+final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
+    # Align with training feature columns
+final_input = final_input.reindex(columns=feature_columns, fill_value=0)
 
     # --- Make prediction ---
 prediction = model.predict(final_input)
