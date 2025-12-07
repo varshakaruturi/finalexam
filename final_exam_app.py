@@ -13,14 +13,14 @@ with open("final_exam_model.pkl", "rb") as file:
 #with open("scaler.pkl", "rb") as file:
 #    scaler = pickle.load(file)
 
-with open("feature_columns.pkl", "rb") as file:
-    feature_columns = pickle.load(file)
+#with open("feature_columns.pkl", "rb") as file:
+  #  feature_columns = pickle.load(file)
 
-with open("imputation_medians.pkl", "rb") as file:
-    imputation_medians = pickle.load(file)
+#with open("imputation_medians.pkl", "rb") as file:
+#    imputation_medians = pickle.load(file)
 
-with open("categorical_options.pkl", "rb") as file:
-    categorical_options = pickle.load(file)
+#with open("categorical_options.pkl", "rb") as file:
+#    categorical_options = pickle.load(file)
 
 # Title for the app
 st.markdown(
@@ -106,12 +106,12 @@ if st.button("Predict Loan Approval"):
     input_categorical_ohe = pd.get_dummies(input_categorical, drop_first=True)
 
     # 5. Concatenate all preprocessed features
-    final_input = pd.concat([input_categorical_ohe, input_numerical_scaled_df], axis=1)
+    #final_input = pd.concat([input_categorical_ohe, input_numerical_scaled_df], axis=1)
 
     # Ensure the order and presence of columns matches training data
     # This is crucial! Any missing columns (due to a category not present in input_categorical_ohe)
     # must be added with a value of 0. Extra columns should be dropped.
-    final_input = final_input.reindex(columns=feature_columns, fill_value=0)
+    #final_input = final_input.reindex(columns=feature_columns, fill_value=0)
 
     # Make prediction
     prediction = model.predict(final_input)
