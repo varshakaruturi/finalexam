@@ -3,7 +3,7 @@ import pickle
 import pandas as pd
 
 # --- Load model ---
-with open("final_exam_model.pkl", "rb") as file:
+with open("test_final_model.pkl", "rb") as file:
     model = pickle.load(file)
 
 # --- Feature columns exactly as trained ---
