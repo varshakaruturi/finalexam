@@ -16,6 +16,42 @@ categorical_options = {
     "Employment_Sector": ["Private", "Government", "Non-Profit", "Self-Employed", "Other"]
 }
 
+    # --- Separate columns ---
+numerical_cols = [
+        'applications', 'Granted_Loan_Amount', 'Requested_Loan_Amount',
+        'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
+        'granted_requested_ratio', 'housing_to_income_ratio'
+]
+categorical_cols = [
+        'Reason', 'Employment_Status', 'Lender', 'Fico_Score_group',
+        'Employment_Sector', 'Ever_Bankrupt_or_Foreclose'
+]
+
+feature_columns = numerical_cols + [
+    # one-hot encoded categorical columns
+    'Reason_Home Improvement',
+    'Reason_Car Purchase',
+    'Reason_Medical',
+    'Reason_Other',
+    'Employment_Status_Self-Employed',
+    'Employment_Status_Unemployed',
+    'Employment_Status_Student',
+    'Employment_Status_Retired',
+    'Lender_Bank B',
+    'Lender_Bank C',
+    'Lender_Credit Union',
+    'Lender_Other',
+    'Fico_Score_group_580-669',
+    'Fico_Score_group_670-739',
+    'Fico_Score_group_740-799',
+    'Fico_Score_group_800-850',
+    'Employment_Sector_Government',
+    'Employment_Sector_Non-Profit',
+    'Employment_Sector_Self-Employed',
+    'Employment_Sector_Other',
+    'Ever_Bankrupt_or_Foreclose_1'
+]
+
 # Title
 st.markdown(
     "<h1 style='text-align: center; background-color: #f0f2f6; padding: 10px; color: #31333F;'><b>Loan Approval Prediction</b></h1>",
@@ -43,41 +79,6 @@ employment_sector = st.selectbox("Employment Sector", categorical_options['Emplo
 ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1],
                                          format_func=lambda x: "Yes" if x == 1 else "No")
 
-    # --- Separate columns ---
-    numerical_cols = [
-        'applications', 'Granted_Loan_Amount', 'Requested_Loan_Amount',
-        'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
-        'granted_requested_ratio', 'housing_to_income_ratio'
-    ]
-    categorical_cols = [
-        'Reason', 'Employment_Status', 'Lender', 'Fico_Score_group',
-        'Employment_Sector', 'Ever_Bankrupt_or_Foreclose'
-    ]
-
-    feature_columns = numerical_cols + [
-    # one-hot encoded categorical columns
-    'Reason_Home Improvement',
-    'Reason_Car Purchase',
-    'Reason_Medical',
-    'Reason_Other',
-    'Employment_Status_Self-Employed',
-    'Employment_Status_Unemployed',
-    'Employment_Status_Student',
-    'Employment_Status_Retired',
-    'Lender_Bank B',
-    'Lender_Bank C',
-    'Lender_Credit Union',
-    'Lender_Other',
-    'Fico_Score_group_580-669',
-    'Fico_Score_group_670-739',
-    'Fico_Score_group_740-799',
-    'Fico_Score_group_800-850',
-    'Employment_Sector_Government',
-    'Employment_Sector_Non-Profit',
-    'Employment_Sector_Self-Employed',
-    'Employment_Sector_Other',
-    'Ever_Bankrupt_or_Foreclose_1'
-]
 
 # --- Prediction Button ---
 if st.button("Predict Loan Approval"):
