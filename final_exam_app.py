@@ -105,15 +105,15 @@ for col in feature_columns:
 final_input = final_input[feature_columns]  # ensure correct order
 
     # Prediction
-    prediction = model.predict(final_input)
-    prediction_proba = model.predict_proba(final_input)[:,1]
+prediction = model.predict(final_input)
+prediction_proba = model.predict_proba(final_input)[:,1]
 
     # Display
-    st.subheader("Prediction Results")
-    if prediction[0]==1:
-        st.success(f"Loan Approval: YES (Probability: {prediction_proba[0]:.2f})")
-        st.balloons()
-    else:
-        st.error(f"Loan Approval: NO (Probability: {prediction_proba[0]:.2f})")
+st.subheader("Prediction Results")
+if prediction[0]==1:
+    st.success(f"Loan Approval: YES (Probability: {prediction_proba[0]:.2f})")
+    st.balloons()
+else:
+    st.error(f"Loan Approval: NO (Probability: {prediction_proba[0]:.2f})")
 
-    st.write("Note: Probability closer to 1 indicates higher likelihood of approval.")
+st.write("Note: Probability closer to 1 indicates higher likelihood of approval.")
