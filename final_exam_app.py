@@ -78,8 +78,8 @@ if st.button("Predict Loan Approval"):
 
     # 1. Impute missing numerical values (if any in original input, though sliders prevent this here)
     # We use saved medians, though for Streamlit inputs, this step might be redundant if all inputs are provided
-    input_df['FICO_score'] = input_df['FICO_score'].fillna(imputation_medians['FICO_score'])
-    input_df['Monthly_Gross_Income'] = input_df['Monthly_Gross_Income'].fillna(imputation_medians['Monthly_Gross_Income'])
+    #input_df['FICO_score'] = input_df['FICO_score'].fillna(imputation_medians['FICO_score'])
+    #input_df['Monthly_Gross_Income'] = input_df['Monthly_Gross_Income'].fillna(imputation_medians['Monthly_Gross_Income'])
 
     # 2. Feature Engineering: Create ratio features
     input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount'] / input_df['Requested_Loan_Amount']
