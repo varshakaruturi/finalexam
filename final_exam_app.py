@@ -43,24 +43,6 @@ employment_sector = st.selectbox("Employment Sector", categorical_options['Emplo
 ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1],
                                          format_func=lambda x: "Yes" if x == 1 else "No")
 
-# --- Prediction Button ---
-if st.button("Predict Loan Approval"):
-
-    # Create DataFrame from inputs
-    input_df = pd.DataFrame({
-        'applications': [applications],
-        'Granted_Loan_Amount': [granted_loan_amount],
-        'Requested_Loan_Amount': [requested_loan_amount],
-        'FICO_score': [fico_score],
-        'Monthly_Gross_Income': [monthly_gross_income],
-        'Monthly_Housing_Payment': [monthly_housing_payment],
-        'Reason': [reason],
-        'Employment_Status': [employment_status],
-        'Lender': [lender],
-        'Fico_Score_group': [fico_score_group],
-        'Employment_Sector': [employment_sector],
-        'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
-    })
     # --- Separate columns ---
     numerical_cols = [
         'applications', 'Granted_Loan_Amount', 'Requested_Loan_Amount',
@@ -96,6 +78,25 @@ if st.button("Predict Loan Approval"):
     'Employment_Sector_Other',
     'Ever_Bankrupt_or_Foreclose_1'
 ]
+
+# --- Prediction Button ---
+if st.button("Predict Loan Approval"):
+    # Create DataFrame from inputs
+    input_df = pd.DataFrame({
+        'applications': [applications],
+        'Granted_Loan_Amount': [granted_loan_amount],
+        'Requested_Loan_Amount': [requested_loan_amount],
+        'FICO_score': [fico_score],
+        'Monthly_Gross_Income': [monthly_gross_income],
+        'Monthly_Housing_Payment': [monthly_housing_payment],
+        'Reason': [reason],
+        'Employment_Status': [employment_status],
+        'Lender': [lender],
+        'Fico_Score_group': [fico_score_group],
+        'Employment_Sector': [employment_sector],
+        'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
+    })
+
 
     
     # --- Feature Engineering ---
