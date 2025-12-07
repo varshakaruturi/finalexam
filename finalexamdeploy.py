@@ -153,8 +153,8 @@ Original file is located at
 
 # Get the password (your IP) and print it.
 # The "&" runs it in the background while the tunnel starts.
-print("Fetching your tunnel password...")
-!curl https://loca.lt/mytunnelpassword &
+#print("Fetching your tunnel password...")
+#!curl https://loca.lt/mytunnelpassword &
 
 # Start the tunnel. This command will keep the cell running and give you the URL.
-!npx localtunnel --port 8501
+#!npx localtunnel --port 8501
