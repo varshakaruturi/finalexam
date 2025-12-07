@@ -3,7 +3,7 @@ import pickle
 import pandas as pd
 import numpy as np
 
-with open("final_exam_model.pkl", "rb") as file:
+with open("test_final_model.pkl", "rb") as file:
     model = pickle.load(file)
 
 # columns
@@ -64,8 +64,8 @@ if st.button("Predict Loan Approval"):
 
     # print result
     if pred == 1:
-        st.success(f"Loan Approved ✅ (Probability: {proba:.2f})")
+        st.success(f"Loan Approved - (Probability: {proba:.2f})")
         st.balloons()
     else:
-        st.error(f"Loan Not Approved ❌ (Probability: {proba:.2f})")
+        st.error(f"Loan Not Approved - (Probability: {proba:.2f})")
 
