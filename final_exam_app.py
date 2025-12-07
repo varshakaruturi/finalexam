@@ -114,7 +114,7 @@ feature_columns = numerical_cols + [
     'Ever_Bankrupt_or_Foreclose_1'
 ]
 
-final_input = final_input.reindex(columns=feature_columns, fill_value=0)
+    final_input = final_input.reindex(columns=feature_columns, fill_value=0)
 
 
     # --- Make prediction ---
