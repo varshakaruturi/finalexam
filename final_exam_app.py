@@ -101,8 +101,8 @@ if st.button("Predict Loan Approval"):
 
 # --- Ensure all columns from training exist ---
     for col in feature_columns:
-    if col not in final_input.columns:
-        final_input[col] = 0
+        if col not in final_input.columns:
+            final_input[col] = 0
         
 # --- Reorder exactly ---
     final_input = final_input[feature_columns]
