@@ -9,8 +9,7 @@ import numpy as np
 # Load the trained model, scaler, feature columns, imputation medians, and categorical options
 with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
-    categorical_options = pickle.load(file)
-
+    
 #with open("scaler.pkl", "rb") as file:
 #    scaler = pickle.load(file)
 
@@ -21,7 +20,15 @@ with open("final_exam_model.pkl", "rb") as file:
 #    imputation_medians = pickle.load(file)
 
 #with open("categorical_options.pkl", "rb") as file:
-    
+    #categorical_options = pickle.load(file)
+
+categorical_options = {
+    "Reason": ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"],
+    "Employment_Status": ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"],
+    "Lender": ["Bank A", "Bank B", "Bank C", "Credit Union", "Other"],
+    "Fico_Score_group": ["300-579", "580-669", "670-739", "740-799", "800-850"],
+    "Employment_Sector": ["Private", "Government", "Non-Profit", "Self-Employed", "Other"]
+}
 
 # Title for the app
 st.markdown(
