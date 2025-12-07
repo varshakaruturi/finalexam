@@ -114,7 +114,7 @@ if st.button("Predict Loan Approval"):
     input_categorical_ohe = pd.get_dummies(input_categorical, drop_first=True)
 
     # 5. Concatenate all preprocessed features
-    #final_input = pd.concat([input_categorical_ohe, input_numerical_scaled_df], axis=1)
+    final_input = pd.concat([input_categorical_ohe, input_numerical_scaled_df], axis=1)
 
     # Ensure the order and presence of columns matches training data
     # This is crucial! Any missing columns (due to a category not present in input_categorical_ohe)
