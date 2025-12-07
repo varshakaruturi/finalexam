@@ -83,11 +83,39 @@ if st.button("Predict Loan Approval"):
     input_categorical_ohe = pd.get_dummies(input_df[categorical_cols], drop_first=True)
 
     # --- Combine with numerical features ---
-    final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
+  #  final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
     # --- Align columns with training data if feature_columns exist ---
     # Optional: if you have `feature_columns` saved during training:
     # final_input = final_input.reindex(columns=feature_columns, fill_value=0)
+
+feature_columns = numerical_cols + [
+    # one-hot encoded categorical columns
+    'Reason_Home Improvement',
+    'Reason_Car Purchase',
+    'Reason_Medical',
+    'Reason_Other',
+    'Employment_Status_Self-Employed',
+    'Employment_Status_Unemployed',
+    'Employment_Status_Student',
+    'Employment_Status_Retired',
+    'Lender_Bank B',
+    'Lender_Bank C',
+    'Lender_Credit Union',
+    'Lender_Other',
+    'Fico_Score_group_580-669',
+    'Fico_Score_group_670-739',
+    'Fico_Score_group_740-799',
+    'Fico_Score_group_800-850',
+    'Employment_Sector_Government',
+    'Employment_Sector_Non-Profit',
+    'Employment_Sector_Self-Employed',
+    'Employment_Sector_Other',
+    'Ever_Bankrupt_or_Foreclose_1'
+]
+
+final_input = final_input.reindex(columns=feature_columns, fill_value=0)
+
 
     # --- Make prediction ---
     prediction = model.predict(final_input)
