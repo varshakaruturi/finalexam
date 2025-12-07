@@ -8,8 +8,8 @@ Original file is located at
 """
 
 # Install all required libraries
-pip install streamlit pandas scikit-learn -q
-npm install localtunnel
+#pip install streamlit pandas scikit-learn -q
+#npm install localtunnel
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile hmeqapp.py
