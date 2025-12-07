@@ -90,24 +90,26 @@ if st.button("Predict Loan Approval"):
     input_df.replace([np.inf,-np.inf], np.nan, inplace=True)
     input_df.fillna(0,inplace=True)
 
-    # --- One-hot encode categorical ---
+    # --- One-hot encode categorical features dynamically ---
     input_categorical_ohe = pd.get_dummies(
-    input_df[['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose']],
-    drop_first=False
+        input_df[['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose']],
+        prefix=['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose'],
+        prefix_sep='_',
+        drop_first=False
     )
 
-# Combine numerical + categorical
+# --- Combine with numerical features ---
     final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
-# Add missing columns (from training) with zeros
+# --- Ensure all columns from training exist ---
     for col in feature_columns:
         if col not in final_input.columns:
             final_input[col] = 0
 
-# Reorder columns to match training exactly
+# --- Reorder exactly ---
     final_input = final_input[feature_columns]
 
-# Make prediction
+# --- Make prediction ---
     prediction = model.predict(final_input)
     prediction_proba = model.predict_proba(final_input)[:, 1]
 
