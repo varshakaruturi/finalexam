@@ -61,13 +61,6 @@ if st.button("Predict Loan Approval"):
         'Employment_Sector': [employment_sector],
         'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
     })
-
-    # --- Feature Engineering ---
-    input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount'] / input_df['Requested_Loan_Amount']
-    input_df['housing_to_income_ratio'] = input_df['Monthly_Housing_Payment'] / input_df['Monthly_Gross_Income']
-    input_df.replace([np.inf, -np.inf], np.nan, inplace=True)
-    input_df.fillna(0, inplace=True)
-
     # --- Separate columns ---
     numerical_cols = [
         'applications', 'Granted_Loan_Amount', 'Requested_Loan_Amount',
@@ -103,6 +96,14 @@ if st.button("Predict Loan Approval"):
     'Employment_Sector_Other',
     'Ever_Bankrupt_or_Foreclose_1'
 ]
+
+    
+    # --- Feature Engineering ---
+    input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount'] / input_df['Requested_Loan_Amount']
+    input_df['housing_to_income_ratio'] = input_df['Monthly_Housing_Payment'] / input_df['Monthly_Gross_Income']
+    input_df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    input_df.fillna(0, inplace=True)
+
 
     # --- One-hot encode categorical variables ---
     input_categorical_ohe = pd.get_dummies(input_df[categorical_cols], drop_first=True)
