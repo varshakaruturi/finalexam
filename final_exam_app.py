@@ -97,7 +97,7 @@ if st.button("Predict Loan Approval"):
     )
 
 # --- Combine with numerical features ---
-final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
+    final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
 # --- Ensure all columns from training exist ---
     for col in feature_columns:
