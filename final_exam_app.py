@@ -93,19 +93,17 @@ if st.button("Predict Loan Approval"):
     # --- One-hot encode categorical features dynamically ---
     input_categorical_ohe = pd.get_dummies(
         input_df[['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose']],
-        prefix=['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose'],
-        prefix_sep='_',
         drop_first=False
     )
 
 # --- Combine with numerical features ---
-    final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
+final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
 # --- Ensure all columns from training exist ---
     for col in feature_columns:
-        if col not in final_input.columns:
-            final_input[col] = 0
-
+    if col not in final_input.columns:
+        final_input[col] = 0
+        
 # --- Reorder exactly ---
     final_input = final_input[feature_columns]
 
