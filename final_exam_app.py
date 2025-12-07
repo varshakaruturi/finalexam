@@ -1,27 +1,13 @@
-
-# -*- coding: utf-8 -*-
 import streamlit as st
 import pickle
 import pandas as pd
 import numpy as np
-#from sklearn.preprocessing import StandardScaler # Required to unpickle the scaler
 
-# Load the trained model, scaler, feature columns, imputation medians, and categorical options
+# Load the trained model
 with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
-    
-#with open("scaler.pkl", "rb") as file:
-#    scaler = pickle.load(file)
 
-#with open("feature_columns.pkl", "rb") as file:
-  #  feature_columns = pickle.load(file)
-
-#with open("imputation_medians.pkl", "rb") as file:
-#    imputation_medians = pickle.load(file)
-
-#with open("categorical_options.pkl", "rb") as file:
-    #categorical_options = pickle.load(file)
-
+# Define categorical options directly
 categorical_options = {
     "Reason": ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"],
     "Employment_Status": ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"],
@@ -30,7 +16,7 @@ categorical_options = {
     "Employment_Sector": ["Private", "Government", "Non-Profit", "Self-Employed", "Other"]
 }
 
-# Title for the app
+# Title
 st.markdown(
     "<h1 style='text-align: center; background-color: #f0f2f6; padding: 10px; color: #31333F;'><b>Loan Approval Prediction</b></h1>",
     unsafe_allow_html=True
@@ -38,7 +24,7 @@ st.markdown(
 
 st.header("Enter Applicant's Details")
 
-# Input fields for numerical values
+# --- Numerical Inputs ---
 st.subheader("Numerical Features")
 applications = st.number_input("Applications (APPLICATIONS)", min_value=1, max_value=10, value=1)
 granted_loan_amount = st.slider("Granted Loan Amount", min_value=5000, max_value=2000000, value=50000, step=1000)
@@ -47,18 +33,20 @@ fico_score = st.slider("FICO Score", min_value=300, max_value=850, value=650, st
 monthly_gross_income = st.slider("Monthly Gross Income", min_value=0, max_value=20000, value=5000, step=100)
 monthly_housing_payment = st.slider("Monthly Housing Payment", min_value=300, max_value=50000, value=1500, step=100)
 
-# Input fields for categorical values
+# --- Categorical Inputs ---
 st.subheader("Categorical Features")
 reason = st.selectbox("Reason for Loan", categorical_options['Reason'])
 employment_status = st.selectbox("Employment Status", categorical_options['Employment_Status'])
 lender = st.selectbox("Lender", categorical_options['Lender'])
-fico_score_group = st.selectbox("Fico Score Group", categorical_options['Fico_Score_group'])
+fico_score_group = st.selectbox("FICO Score Group", categorical_options['Fico_Score_group'])
 employment_sector = st.selectbox("Employment Sector", categorical_options['Employment_Sector'])
-ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No")
+ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1],
+                                         format_func=lambda x: "Yes" if x == 1 else "No")
 
-# Create a button to make predictions
+# --- Prediction Button ---
 if st.button("Predict Loan Approval"):
-    # Create a DataFrame from current inputs (before preprocessing)
+
+    # Create DataFrame from inputs
     input_df = pd.DataFrame({
         'applications': [applications],
         'Granted_Loan_Amount': [granted_loan_amount],
@@ -74,57 +62,38 @@ if st.button("Predict Loan Approval"):
         'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
     })
 
-    # --- Preprocessing identical to training data ---
-
-    # 1. Impute missing numerical values (if any in original input, though sliders prevent this here)
-    # We use saved medians, though for Streamlit inputs, this step might be redundant if all inputs are provided
-    #input_df['FICO_score'] = input_df['FICO_score'].fillna(imputation_medians['FICO_score'])
-    #input_df['Monthly_Gross_Income'] = input_df['Monthly_Gross_Income'].fillna(imputation_medians['Monthly_Gross_Income'])
-
-    # 2. Feature Engineering: Create ratio features
+    # --- Feature Engineering ---
     input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount'] / input_df['Requested_Loan_Amount']
     input_df['housing_to_income_ratio'] = input_df['Monthly_Housing_Payment'] / input_df['Monthly_Gross_Income']
-
-    # Handle potential inf/-inf from division by zero, fillna(0) for engineered features
     input_df.replace([np.inf, -np.inf], np.nan, inplace=True)
-    input_df['granted_requested_ratio'] = input_df['granted_requested_ratio'].fillna(0)
-    input_df['housing_to_income_ratio'] = input_df['housing_to_income_ratio'].fillna(0)
+    input_df.fillna(0, inplace=True)
 
-    # Separate numerical and categorical for consistent processing
-    numerical_cols_for_scaling = [
+    # --- Separate columns ---
+    numerical_cols = [
         'applications', 'Granted_Loan_Amount', 'Requested_Loan_Amount',
         'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
         'granted_requested_ratio', 'housing_to_income_ratio'
     ]
-    categorical_cols_for_ohe = [
+    categorical_cols = [
         'Reason', 'Employment_Status', 'Lender', 'Fico_Score_group',
         'Employment_Sector', 'Ever_Bankrupt_or_Foreclose'
     ]
 
-    input_numerical = input_df[numerical_cols_for_scaling]
-    input_categorical = input_df[categorical_cols_for_ohe]
+    # --- One-hot encode categorical variables ---
+    input_categorical_ohe = pd.get_dummies(input_df[categorical_cols], drop_first=True)
 
-    # 3. Scale numerical features
-   # input_numerical_scaled = scaler.transform(input_numerical)
-    #input_numerical_scaled_df = pd.DataFrame(
-     #   input_numerical_scaled, columns=numerical_cols_for_scaling, index=input_df.index
-    #)
+    # --- Combine with numerical features ---
+    final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
-    # 4. One-hot encode categorical features
-    input_categorical_ohe = pd.get_dummies(input_categorical, drop_first=True)
+    # --- Align columns with training data if feature_columns exist ---
+    # Optional: if you have `feature_columns` saved during training:
+    # final_input = final_input.reindex(columns=feature_columns, fill_value=0)
 
-    # 5. Concatenate all preprocessed features
-    final_input = pd.concat([input_categorical_ohe, input_numerical_scaled_df], axis=1)
-
-    # Ensure the order and presence of columns matches training data
-    # This is crucial! Any missing columns (due to a category not present in input_categorical_ohe)
-    # must be added with a value of 0. Extra columns should be dropped.
-    #final_input = final_input.reindex(columns=feature_columns, fill_value=0)
-
-    # Make prediction
+    # --- Make prediction ---
     prediction = model.predict(final_input)
     prediction_proba = model.predict_proba(final_input)[:, 1]
 
+    # --- Show results ---
     st.subheader("Prediction Results")
     if prediction[0] == 1:
         st.success(f"Loan Approval: YES (Probability: {prediction_proba[0]:.2f})")
@@ -132,4 +101,4 @@ if st.button("Predict Loan Approval"):
     else:
         st.error(f"Loan Approval: NO (Probability: {prediction_proba[0]:.2f})")
 
-    st.write("Note: A probability closer to 1 indicates higher likelihood of approval.")
+    st.write("Note: Probability closer to 1 indicates higher likelihood of approval.")
