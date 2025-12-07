@@ -1,27 +1,11 @@
 import streamlit as st
 import pickle
-import pandas as pd
+import numpy as np
 
 # Load model
 with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
 
-# Hardcoded feature columns exactly as in training
-feature_columns = [
-    'applications', 'Granted_Loan_Amount', 'Requested_Loan_Amount', 'FICO_score',
-    'Monthly_Gross_Income', 'Monthly_Housing_Payment', 'granted_requested_ratio', 'housing_to_income_ratio',
-    'Reason_Debt Consolidation', 'Reason_Home Improvement', 'Reason_Car Purchase', 'Reason_Medical', 'Reason_Other',
-    'Employment_Status_Employed', 'Employment_Status_Self-Employed', 'Employment_Status_Unemployed',
-    'Employment_Status_Student', 'Employment_Status_Retired',
-    'Lender_Bank A', 'Lender_Bank B', 'Lender_Bank C', 'Lender_Credit Union', 'Lender_Other',
-    'Fico_Score_group_300-579', 'Fico_Score_group_580-669', 'Fico_Score_group_670-739',
-    'Fico_Score_group_740-799', 'Fico_Score_group_800-850',
-    'Employment_Sector_Private', 'Employment_Sector_Government', 'Employment_Sector_Non-Profit',
-    'Employment_Sector_Self-Employed', 'Employment_Sector_Other',
-    'Ever_Bankrupt_or_Foreclose_0', 'Ever_Bankrupt_or_Foreclose_1'
-]
-
-# Streamlit UI
 st.title("Loan Approval Prediction")
 
 # Numerical inputs
@@ -32,48 +16,44 @@ fico_score = st.number_input("FICO Score", 300, 850, 650)
 monthly_gross_income = st.number_input("Monthly Gross Income", 0, 20000, 5000)
 monthly_housing_payment = st.number_input("Monthly Housing Payment", 300, 50000, 1500)
 
-# Categorical inputs
-reason = st.selectbox("Reason", ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"])
-employment_status = st.selectbox("Employment Status", ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"])
-lender = st.selectbox("Lender", ["Bank A", "Bank B", "Bank C", "Credit Union", "Other"])
-fico_score_group = st.selectbox("FICO Score Group", ["300-579", "580-669", "670-739", "740-799", "800-850"])
-employment_sector = st.selectbox("Employment Sector", ["Private", "Government", "Non-Profit", "Self-Employed", "Other"])
-ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], format_func=lambda x: "Yes" if x else "No")
+# Categorical inputs mapped to integers manually
+reason_map = {"Debt Consolidation":0,"Home Improvement":1,"Car Purchase":2,"Medical":3,"Other":4}
+employment_map = {"Employed":0,"Self-Employed":1,"Unemployed":2,"Student":3,"Retired":4}
+lender_map = {"Bank A":0,"Bank B":1,"Bank C":2,"Credit Union":3,"Other":4}
+fico_group_map = {"300-579":0,"580-669":1,"670-739":2,"740-799":3,"800-850":4}
+sector_map = {"Private":0,"Government":1,"Non-Profit":2,"Self-Employed":3,"Other":4}
+
+reason = st.selectbox("Reason", list(reason_map.keys()))
+employment_status = st.selectbox("Employment Status", list(employment_map.keys()))
+lender = st.selectbox("Lender", list(lender_map.keys()))
+fico_score_group = st.selectbox("FICO Score Group", list(fico_group_map.keys()))
+employment_sector = st.selectbox("Employment Sector", list(sector_map.keys()))
+ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], format_func=lambda x:"Yes" if x else "No")
 
 if st.button("Predict Loan Approval"):
-    # Build DataFrame with numeric features
-    df = pd.DataFrame({
-        'applications': [applications],
-        'Granted_Loan_Amount': [granted_loan_amount],
-        'Requested_Loan_Amount': [requested_loan_amount],
-        'FICO_score': [fico_score],
-        'Monthly_Gross_Income': [monthly_gross_income],
-        'Monthly_Housing_Payment': [monthly_housing_payment],
-        'granted_requested_ratio': [granted_loan_amount / requested_loan_amount],
-        'housing_to_income_ratio': [monthly_housing_payment / monthly_gross_income]
-    })
-
-    # Initialize all one-hot columns to 0
-    for col in feature_columns:
-        if col not in df.columns:
-            df[col] = 0
-
-    # Map categorical inputs to the correct one-hot column
-    df[f"Reason_{reason}"] = 1
-    df[f"Employment_Status_{employment_status}"] = 1
-    df[f"Lender_{lender}"] = 1
-    df[f"Fico_Score_group_{fico_score_group}"] = 1
-    df[f"Employment_Sector_{employment_sector}"] = 1
-    df[f"Ever_Bankrupt_or_Foreclose_{ever_bankrupt_or_foreclose}"] = 1
-
-    # Reorder columns exactly as in training
-    df = df[feature_columns]
+    # Convert all features to numeric in the same order as training
+    input_array = np.array([[
+        applications,
+        granted_loan_amount,
+        requested_loan_amount,
+        fico_score,
+        monthly_gross_income,
+        monthly_housing_payment,
+        granted_loan_amount / requested_loan_amount,
+        monthly_housing_payment / monthly_gross_income,
+        reason_map[reason],
+        employment_map[employment_status],
+        lender_map[lender],
+        fico_group_map[fico_score_group],
+        sector_map[employment_sector],
+        ever_bankrupt_or_foreclose
+    ]], dtype=float)
 
     # Predict
-    pred = model.predict(df)[0]
-    proba = model.predict_proba(df)[0][1]
+    pred = model.predict(input_array)[0]
+    proba = model.predict_proba(input_array)[0][1]
 
-    if pred == 1:
+    if pred==1:
         st.success(f"Loan Approved ✅ (Probability: {proba:.2f})")
         st.balloons()
     else:
