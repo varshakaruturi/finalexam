@@ -91,29 +91,29 @@ if st.button("Predict Loan Approval"):
     input_df.fillna(0,inplace=True)
 
     # --- One-hot encode categorical ---
-input_categorical_ohe = pd.get_dummies(
+    input_categorical_ohe = pd.get_dummies(
     input_df[['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose']]
-)
+    )
 
 # --- Combine with numerical features ---
-final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
+    final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
 # --- Ensure all model columns are present ---
-for col in feature_columns:
-    if col not in final_input.columns:
-        final_input[col] = 0  # add missing columns
-final_input = final_input[feature_columns]  # ensure correct order
+    for col in feature_columns:
+        if col not in final_input.columns:
+            final_input[col] = 0  # add missing columns
+    final_input = final_input[feature_columns]  # ensure correct order
 
     # Prediction
-prediction = model.predict(final_input)
-prediction_proba = model.predict_proba(final_input)[:,1]
+    prediction = model.predict(final_input)
+    prediction_proba = model.predict_proba(final_input)[:,1]
 
     # Display
-st.subheader("Prediction Results")
-if prediction[0]==1:
-    st.success(f"Loan Approval: YES (Probability: {prediction_proba[0]:.2f})")
-    st.balloons()
-else:
-    st.error(f"Loan Approval: NO (Probability: {prediction_proba[0]:.2f})")
+    st.subheader("Prediction Results")
+    if prediction[0]==1:
+        st.success(f"Loan Approval: YES (Probability: {prediction_proba[0]:.2f})")
+        st.balloons()
+    else:
+        st.error(f"Loan Approval: NO (Probability: {prediction_proba[0]:.2f})")
 
-st.write("Note: Probability closer to 1 indicates higher likelihood of approval.")
+    st.write("Note: Probability closer to 1 indicates higher likelihood of approval.")
