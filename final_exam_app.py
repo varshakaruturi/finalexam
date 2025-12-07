@@ -8,13 +8,22 @@ with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
 
 # --- Define categorical options ---
-categorical_options = {
-    "Reason": ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"],
-    "Employment_Status": ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"],
-    "Lender": ["Bank A", "Bank B", "Bank C", "Credit Union", "Other"],
-    "Fico_Score_group": ["300-579", "580-669", "670-739", "740-799", "800-850"],
-    "Employment_Sector": ["Private", "Government", "Non-Profit", "Self-Employed", "Other"]
-}
+categorical_options = [
+    #"Reason": ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"],
+    #"Employment_Status": ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"],
+    #"Lender": ["Bank A", "Bank B", "Bank C", "Credit Union", "Other"],
+    #"Fico_Score_group": ["300-579", "580-669", "670-739", "740-799", "800-850"],
+    #"Employment_Sector": ["Private", "Government", "Non-Profit", "Self-Employed", "Other"]
+    'Reason_Debt Consolidation', 'Reason_Home Improvement', 'Reason_Car Purchase', 'Reason_Medical', 'Reason_Other',
+    'Employment_Status_Employed', 'Employment_Status_Self-Employed', 'Employment_Status_Unemployed',
+    'Employment_Status_Student', 'Employment_Status_Retired',
+    'Lender_Bank A', 'Lender_Bank B', 'Lender_Bank C', 'Lender_Credit Union', 'Lender_Other',
+    'Fico_Score_group_300-579', 'Fico_Score_group_580-669', 'Fico_Score_group_670-739',
+    'Fico_Score_group_740-799', 'Fico_Score_group_800-850',
+    'Employment_Sector_Private', 'Employment_Sector_Government', 'Employment_Sector_Non-Profit',
+    'Employment_Sector_Self-Employed', 'Employment_Sector_Other',
+    'Ever_Bankrupt_or_Foreclose_0', 'Ever_Bankrupt_or_Foreclose_1'
+]
 
 # --- Define columns ---
 numerical_cols = [
@@ -69,42 +78,24 @@ ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0,1], f
 if st.button("Predict Loan Approval"):
 
     # Input DataFrame
-    input_df = pd.DataFrame({
-        'applications':[applications],
-        'Granted_Loan_Amount':[granted_loan_amount],
-        'Requested_Loan_Amount':[requested_loan_amount],
-        'FICO_score':[fico_score],
-        'Monthly_Gross_Income':[monthly_gross_income],
-        'Monthly_Housing_Payment':[monthly_housing_payment],
-        'Reason':[reason],
-        'Employment_Status':[employment_status],
-        'Lender':[lender],
-        'Fico_Score_group':[fico_score_group],
-        'Employment_Sector':[employment_sector],
-        'Ever_Bankrupt_or_Foreclose':[ever_bankrupt_or_foreclose]
-    })
+    input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount'] / input_df['Requested_Loan_Amount']
+    input_df['housing_to_income_ratio'] = input_df['Monthly_Housing_Payment'] / input_df['Monthly_Gross_Income']
+    input_df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    input_df.fillna(0, inplace=True)
 
-    # Feature engineering
-    input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount']/input_df['Requested_Loan_Amount']
-    input_df['housing_to_income_ratio'] = input_df['Monthly_Housing_Payment']/input_df['Monthly_Gross_Income']
-    input_df.replace([np.inf,-np.inf], np.nan, inplace=True)
-    input_df.fillna(0,inplace=True)
+# 2. One-hot encode categorical columns
+    categorical_cols = ['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose']
+    input_categorical_ohe = pd.get_dummies(input_df[categorical_cols], drop_first=False)
 
-    # --- One-hot encode categorical features dynamically ---
-    input_categorical_ohe = pd.get_dummies(
-        input_df[['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose']],
-        drop_first=False
-    )
-
-# --- Combine with numerical features ---
+# 3. Combine numerical + categorical
     final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
-# --- Ensure all columns from training exist ---
+# 4. Add any missing columns with zeros
     for col in feature_columns:
         if col not in final_input.columns:
             final_input[col] = 0
-        
-# --- Reorder exactly ---
+
+# 5. Reorder columns exactly as in training
     final_input = final_input[feature_columns]
 
 # --- Make prediction ---
