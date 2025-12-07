@@ -79,17 +79,7 @@ if st.button("Predict Loan Approval"):
         'Employment_Sector', 'Ever_Bankrupt_or_Foreclose'
     ]
 
-    # --- One-hot encode categorical variables ---
-    input_categorical_ohe = pd.get_dummies(input_df[categorical_cols], drop_first=True)
-
-    # --- Combine with numerical features ---
-  #  final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
-
-    # --- Align columns with training data if feature_columns exist ---
-    # Optional: if you have `feature_columns` saved during training:
-    # final_input = final_input.reindex(columns=feature_columns, fill_value=0)
-
-feature_columns = numerical_cols + [
+    feature_columns = numerical_cols + [
     # one-hot encoded categorical columns
     'Reason_Home Improvement',
     'Reason_Car Purchase',
@@ -113,6 +103,16 @@ feature_columns = numerical_cols + [
     'Employment_Sector_Other',
     'Ever_Bankrupt_or_Foreclose_1'
 ]
+
+    # --- One-hot encode categorical variables ---
+    input_categorical_ohe = pd.get_dummies(input_df[categorical_cols], drop_first=True)
+
+    # --- Combine with numerical features ---
+  #  final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
+
+    # --- Align columns with training data if feature_columns exist ---
+    # Optional: if you have `feature_columns` saved during training:
+    # final_input = final_input.reindex(columns=feature_columns, fill_value=0)
 
 #final_input = final_input.reindex(columns=feature_columns, fill_value=0)
     # Combine numerical + categorical
