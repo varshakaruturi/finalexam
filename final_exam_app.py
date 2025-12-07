@@ -4,14 +4,14 @@ import streamlit as st
 import pickle
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler # Required to unpickle the scaler
+#from sklearn.preprocessing import StandardScaler # Required to unpickle the scaler
 
 # Load the trained model, scaler, feature columns, imputation medians, and categorical options
 with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
 
-with open("scaler.pkl", "rb") as file:
-    scaler = pickle.load(file)
+#with open("scaler.pkl", "rb") as file:
+#    scaler = pickle.load(file)
 
 with open("feature_columns.pkl", "rb") as file:
     feature_columns = pickle.load(file)
@@ -97,10 +97,10 @@ if st.button("Predict Loan Approval"):
     input_categorical = input_df[categorical_cols_for_ohe]
 
     # 3. Scale numerical features
-    input_numerical_scaled = scaler.transform(input_numerical)
-    input_numerical_scaled_df = pd.DataFrame(
-        input_numerical_scaled, columns=numerical_cols_for_scaling, index=input_df.index
-    )
+   # input_numerical_scaled = scaler.transform(input_numerical)
+    #input_numerical_scaled_df = pd.DataFrame(
+     #   input_numerical_scaled, columns=numerical_cols_for_scaling, index=input_df.index
+    #)
 
     # 4. One-hot encode categorical features
     input_categorical_ohe = pd.get_dummies(input_categorical, drop_first=True)
