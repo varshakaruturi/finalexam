@@ -72,20 +72,20 @@ ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1],
 # --- Prediction button ---
 if st.button("Predict Loan Approval"):
 
-input_df = pd.DataFrame({
-    'applications': [applications],
-    'Granted_Loan_Amount': [granted_loan_amount],
-    'Requested_Loan_Amount': [requested_loan_amount],
-    'FICO_score': [fico_score],
-    'Monthly_Gross_Income': [monthly_gross_income],
-    'Monthly_Housing_Payment': [monthly_housing_payment],
-    'Reason': [reason],
-    'Employment_Status': [employment_status],
-    'Lender': [lender],
-    'Fico_Score_group': [fico_score_group],
-    'Employment_Sector': [employment_sector],
-    'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
-})
+    input_df = pd.DataFrame({
+        'applications': [applications],
+        'Granted_Loan_Amount': [granted_loan_amount],
+        'Requested_Loan_Amount': [requested_loan_amount],
+        'FICO_score': [fico_score],
+        'Monthly_Gross_Income': [monthly_gross_income],
+        'Monthly_Housing_Payment': [monthly_housing_payment],
+        'Reason': [reason],
+        'Employment_Status': [employment_status],
+        'Lender': [lender],
+        'Fico_Score_group': [fico_score_group],
+        'Employment_Sector': [employment_sector],
+        'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
+    })
     
     # Input DataFrame
     input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount'] / input_df['Requested_Loan_Amount']
