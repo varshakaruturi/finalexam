@@ -3,12 +3,24 @@ import pickle
 import pandas as pd
 import numpy as np
 
+#with open("final_exam_model.pkl", "rb") as file:
 with open("test_final_model.pkl", "rb") as file:
     model = pickle.load(file)
 
 # columns
-feature_columns = model.feature_names_in_  
+#feature_columns = model.feature_names_in_  
 
+# --- Columns used in the model (hardcoded) ---
+feature_columns = [
+    'applications', 'Granted_Loan_Amount', 'Requested_Loan_Amount', 'FICO_score',
+    'Monthly_Gross_Income', 'Monthly_Housing_Payment', 'granted_requested_ratio', 'housing_to_income_ratio',
+    'Reason_Home Improvement', 'Reason_Car Purchase', 'Reason_Medical', 'Reason_Other',
+    'Employment_Status_Self-Employed', 'Employment_Status_Unemployed', 'Employment_Status_Student', 'Employment_Status_Retired',
+    'Lender_Bank B', 'Lender_Bank C', 'Lender_Credit Union', 'Lender_Other',
+    'Fico_Score_group_580-669', 'Fico_Score_group_670-739', 'Fico_Score_group_740-799', 'Fico_Score_group_800-850',
+    'Employment_Sector_Government', 'Employment_Sector_Non-Profit', 'Employment_Sector_Self-Employed', 'Employment_Sector_Other',
+    'Ever_Bankrupt_or_Foreclose_1'
+]
 # title
 st.title("Loan Approval Prediction")
 
