@@ -53,12 +53,13 @@ st.markdown("<h1 style='text-align:center; background-color:#f0f2f6; padding:10p
 st.header("Enter Applicant's Details")
 
 applications = st.number_input("Applications", min_value=1, max_value=10, value=1)
-granted_loan_amount = st.slider("Granted Loan Amount", 5000, 2000000, 50000, 1000)
-requested_loan_amount = st.slider("Requested Loan Amount", 5000, 2500000, 60000, 1000)
-fico_score = st.slider("FICO Score", 300, 850, 650, 1)
-monthly_gross_income = st.slider("Monthly Gross Income", 0, 20000, 5000, 100)
-monthly_housing_payment = st.slider("Monthly Housing Payment", 300, 50000, 1500, 100)
+granted_loan_amount = st.slider("Granted Loan Amount", min_value=5000, max_value=2000000, value=50000, step=1000)
+requested_loan_amount = st.slider("Requested Loan Amount", min_value=5000, max_value=2500000, value=60000, step=1000)
+fico_score = st.slider("FICO Score", min_value=300, max_value=850, value=650, step=1)
+monthly_gross_income = st.slider("Monthly Gross Income", min_value=0, max_value=20000, value=5000, step=100)
+monthly_housing_payment = st.slider("Monthly Housing Payment", min_value=300, max_value=50000, value=1500, step=100)
 
+# Categorical inputs
 reason = st.selectbox("Reason", categorical_options['Reason'])
 employment_status = st.selectbox("Employment Status", categorical_options['Employment_Status'])
 lender = st.selectbox("Lender", categorical_options['Lender'])
@@ -67,14 +68,31 @@ employment_sector = st.selectbox("Employment Sector", categorical_options['Emplo
 ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1],
                                          format_func=lambda x: "Yes" if x == 1 else "No")
 
+
 # --- Prediction button ---
 if st.button("Predict Loan Approval"):
 
+input_df = pd.DataFrame({
+    'applications': [applications],
+    'Granted_Loan_Amount': [granted_loan_amount],
+    'Requested_Loan_Amount': [requested_loan_amount],
+    'FICO_score': [fico_score],
+    'Monthly_Gross_Income': [monthly_gross_income],
+    'Monthly_Housing_Payment': [monthly_housing_payment],
+    'Reason': [reason],
+    'Employment_Status': [employment_status],
+    'Lender': [lender],
+    'Fico_Score_group': [fico_score_group],
+    'Employment_Sector': [employment_sector],
+    'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
+})
+    
     # Input DataFrame
     input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount'] / input_df['Requested_Loan_Amount']
     input_df['housing_to_income_ratio'] = input_df['Monthly_Housing_Payment'] / input_df['Monthly_Gross_Income']
     input_df.replace([np.inf, -np.inf], np.nan, inplace=True)
     input_df.fillna(0, inplace=True)
+
 
 # 2. One-hot encode categorical columns
     categorical_cols = ['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose']
