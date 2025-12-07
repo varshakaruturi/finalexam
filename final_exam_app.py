@@ -118,15 +118,15 @@ final_input = final_input.reindex(columns=feature_columns, fill_value=0)
 
 
     # --- Make prediction ---
-    prediction = model.predict(final_input)
-    prediction_proba = model.predict_proba(final_input)[:, 1]
+prediction = model.predict(final_input)
+prediction_proba = model.predict_proba(final_input)[:, 1]
 
     # --- Show results ---
-    st.subheader("Prediction Results")
-    if prediction[0] == 1:
-        st.success(f"Loan Approval: YES (Probability: {prediction_proba[0]:.2f})")
-        st.balloons()
-    else:
-        st.error(f"Loan Approval: NO (Probability: {prediction_proba[0]:.2f})")
+st.subheader("Prediction Results")
+if prediction[0] == 1:
+    st.success(f"Loan Approval: YES (Probability: {prediction_proba[0]:.2f})")
+    st.balloons()
+else:
+    st.error(f"Loan Approval: NO (Probability: {prediction_proba[0]:.2f})")
 
-    st.write("Note: Probability closer to 1 indicates higher likelihood of approval.")
+st.write("Note: Probability closer to 1 indicates higher likelihood of approval.")
