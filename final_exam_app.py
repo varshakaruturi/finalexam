@@ -3,14 +3,13 @@ import pickle
 import pandas as pd
 import numpy as np
 
-# --- Load model ---
 with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
 
-# --- Columns expected by model ---
-feature_columns = model.feature_names_in_  # get columns from model itself
+# columns
+feature_columns = model.feature_names_in_  
 
-# --- Streamlit UI ---
+# title
 st.title("Loan Approval Prediction")
 
 # Numerical inputs
@@ -29,9 +28,8 @@ fico_score_group = st.selectbox("FICO Score Group", ["300-579", "580-669", "670-
 employment_sector = st.selectbox("Employment Sector", ["Private", "Government", "Non-Profit", "Self-Employed", "Other"])
 ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], format_func=lambda x: "Yes" if x else "No")
 
-# --- Predict button ---
+# predict
 if st.button("Predict Loan Approval"):
-    # Build input DataFrame
     df = pd.DataFrame({
         'applications': [applications],
         'Granted_Loan_Amount': [granted_loan_amount],
@@ -47,7 +45,6 @@ if st.button("Predict Loan Approval"):
         'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
     })
 
-    # Feature engineering
     df['granted_requested_ratio'] = df['Granted_Loan_Amount'] / df['Requested_Loan_Amount']
     df['housing_to_income_ratio'] = df['Monthly_Housing_Payment'] / df['Monthly_Gross_Income']
     df.replace([np.inf, -np.inf], 0, inplace=True)
@@ -61,11 +58,11 @@ if st.button("Predict Loan Approval"):
             df[col] = 0
     df = df[feature_columns]
 
-    # Make prediction
+    # prediction
     pred = model.predict(df)[0]
     proba = model.predict_proba(df)[0][1]
 
-    # Display result
+    # print result
     if pred == 1:
         st.success(f"Loan Approved ✅ (Probability: {proba:.2f})")
         st.balloons()
