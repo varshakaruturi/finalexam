@@ -149,7 +149,7 @@ Original file is located at
 # numpy
 
 # Run the app in the background
-!streamlit run finalexamapp.py.py &>/dev/null&
+#!streamlit run finalexamapp.py.py &>/dev/null&
 
 # Get the password (your IP) and print it.
 # The "&" runs it in the background while the tunnel starts.
