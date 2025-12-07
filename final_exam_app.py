@@ -41,7 +41,7 @@ monthly_housing_payment = st.slider("Monthly Housing Payment", min_value=300, ma
 
 # Input fields for categorical values
 st.subheader("Categorical Features")
-reason = st.selectbox("Reason for Loan", categorical_options['Reason'])
+#reason = st.selectbox("Reason for Loan", categorical_options['Reason'])
 employment_status = st.selectbox("Employment Status", categorical_options['Employment_Status'])
 lender = st.selectbox("Lender", categorical_options['Lender'])
 fico_score_group = st.selectbox("Fico Score Group", categorical_options['Fico_Score_group'])
