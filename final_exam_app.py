@@ -1,80 +1,124 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import numpy as np
 
 # --- Load model ---
-with open("test_final_model.pkl", "rb") as file:
+with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
 
-# --- Feature columns exactly as trained ---
-feature_columns = [
-    'Granted_Loan_Amount', 'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
-    'Ever_Bankrupt_or_Foreclose',
-    'Reason_credit_card_refinancing', 'Reason_debt_conslidation', 'Reason_home_improvement',
-    'Reason_major_purchase', 'Reason_other',
-    'Employment_Status_employed', 'Employment_Status_self_employed',
-    'Employment_Status_unemployed', 'Employment_Status_student', 'Employment_Status_retired',
-    'Employment_Sector_energy', 'Employment_Sector_financials', 'Employment_Sector_health_care',
-    'Employment_Sector_industrials', 'Employment_Sector_information_technology',
-    'Employment_Sector_materials', 'Employment_Sector_real_estate', 'Employment_Sector_utilities',
-    'Lender_B', 'Lender_C'
+# --- Define categorical options ---
+categorical_options = categorical_options = {
+    "Reason": ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"],
+    "Employment_Status": ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"],
+    "Lender": ["Bank A", "Bank B", "Bank C", "Credit Union", "Other"],
+    "Fico_Score_group": ["300-579", "580-669", "670-739", "740-799", "800-850"],
+    "Employment_Sector": ["Private", "Government", "Non-Profit", "Self-Employed", "Other"]
+}
+
+
+# --- Define columns ---
+numerical_cols = [
+    'applications', 'Granted_Loan_Amount', 'Requested_Loan_Amount',
+    'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
+    'granted_requested_ratio', 'housing_to_income_ratio'
 ]
 
-# --- Streamlit UI ---
-st.markdown("<h1 style='text-align:center;'>Loan Approval Prediction</h1>", unsafe_allow_html=True)
+feature_columns = numerical_cols + [
+    'Reason_Home Improvement',
+    'Reason_Car Purchase',
+    'Reason_Medical',
+    'Reason_Other',
+    'Employment_Status_Self-Employed',
+    'Employment_Status_Unemployed',
+    'Employment_Status_Student',
+    'Employment_Status_Retired',
+    'Lender_Bank B',
+    'Lender_Bank C',
+    'Lender_Credit Union',
+    'Lender_Other',
+    'Fico_Score_group_580-669',
+    'Fico_Score_group_670-739',
+    'Fico_Score_group_740-799',
+    'Fico_Score_group_800-850',
+    'Employment_Sector_Government',
+    'Employment_Sector_Non-Profit',
+    'Employment_Sector_Self-Employed',
+    'Employment_Sector_Other',
+    'Ever_Bankrupt_or_Foreclose_1'
+]
 
-# Numeric inputs
-granted_loan = st.number_input("Granted Loan Amount", 5000, 2000000, 50000, step=1000)
-fico_score = st.slider("FICO Score", 300, 850, 650)
-monthly_income = st.number_input("Monthly Gross Income", 0, 20000, 5000)
-monthly_housing = st.number_input("Monthly Housing Payment", 300, 50000, 1500)
-ever_bankrupt = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], format_func=lambda x: "Yes" if x else "No")
+# --- Streamlit inputs ---
+st.markdown("<h1 style='text-align:center; background-color:#f0f2f6; padding:10px; color:#31333F;'><b>Loan Approval Prediction</b></h1>", unsafe_allow_html=True)
+st.header("Enter Applicant's Details")
+
+applications = st.number_input("Applications", min_value=1, max_value=10, value=1)
+granted_loan_amount = st.slider("Granted Loan Amount", min_value=5000, max_value=2000000, value=50000, step=1000)
+requested_loan_amount = st.slider("Requested Loan Amount", min_value=5000, max_value=2500000, value=60000, step=1000)
+fico_score = st.slider("FICO Score", min_value=300, max_value=850, value=650, step=1)
+monthly_gross_income = st.slider("Monthly Gross Income", min_value=0, max_value=20000, value=5000, step=100)
+monthly_housing_payment = st.slider("Monthly Housing Payment", min_value=300, max_value=50000, value=1500, step=100)
 
 # Categorical inputs
-reason = st.selectbox("Reason for Loan", ['credit_card_refinancing', 'debt_conslidation', 'home_improvement', 'major_purchase', 'other'])
-employment_status = st.selectbox("Employment Status", ['employed', 'self_employed', 'unemployed', 'student', 'retired'])
-employment_sector = st.selectbox("Employment Sector", ['energy', 'financials', 'health_care', 'industrials', 'information_technology', 'materials', 'real_estate', 'utilities'])
-lender = st.selectbox("Lender", ['B', 'C', 'Other'])
+reason = st.selectbox("Reason", categorical_options['Reason'])
+employment_status = st.selectbox("Employment Status", categorical_options['Employment_Status'])
+lender = st.selectbox("Lender", categorical_options['Lender'])
+fico_score_group = st.selectbox("FICO Score Group", categorical_options['Fico_Score_group'])
+employment_sector = st.selectbox("Employment Sector", categorical_options['Employment_Sector'])
+ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1],
+                                         format_func=lambda x: "Yes" if x == 1 else "No")
 
+
+# --- Prediction button ---
 if st.button("Predict Loan Approval"):
-    # Initialize all columns to 0/False
-    input_dict = {col: 0 for col in feature_columns}
 
-    # Fill numeric columns
-    input_dict['Granted_Loan_Amount'] = granted_loan
-    input_dict['FICO_score'] = fico_score
-    input_dict['Monthly_Gross_Income'] = monthly_income
-    input_dict['Monthly_Housing_Payment'] = monthly_housing
-    input_dict['Ever_Bankrupt_or_Foreclose'] = ever_bankrupt
+    input_df = pd.DataFrame({
+        'applications': [applications],
+        'Granted_Loan_Amount': [granted_loan_amount],
+        'Requested_Loan_Amount': [requested_loan_amount],
+        'FICO_score': [fico_score],
+        'Monthly_Gross_Income': [monthly_gross_income],
+        'Monthly_Housing_Payment': [monthly_housing_payment],
+        'Reason': [reason],
+        'Employment_Status': [employment_status],
+        'Lender': [lender],
+        'Fico_Score_group': [fico_score_group],
+        'Employment_Sector': [employment_sector],
+        'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
+    })
+    
+    # Input DataFrame
+    input_df['granted_requested_ratio'] = input_df['Granted_Loan_Amount'] / input_df['Requested_Loan_Amount']
+    input_df['housing_to_income_ratio'] = input_df['Monthly_Housing_Payment'] / input_df['Monthly_Gross_Income']
+    input_df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    input_df.fillna(0, inplace=True)
 
-    # Fill one-hot encoded categorical columns
-    # Reason
-    reason_col = f"Reason_{reason}"
-    if reason_col in feature_columns:
-        input_dict[reason_col] = 1
-    # Employment Status
-    status_col = f"Employment_Status_{employment_status}"
-    if status_col in feature_columns:
-        input_dict[status_col] = 1
-    # Employment Sector
-    sector_col = f"Employment_Sector_{employment_sector}"
-    if sector_col in feature_columns:
-        input_dict[sector_col] = 1
-    # Lender
-    lender_col = f"Lender_{lender}"
-    if lender_col in feature_columns:
-        input_dict[lender_col] = 1
 
-    # Convert to DataFrame with proper column order
-    df_input = pd.DataFrame([input_dict], columns=feature_columns)
+# 2. One-hot encode categorical columns
+    categorical_cols = ['Reason','Employment_Status','Lender','Fico_Score_group','Employment_Sector','Ever_Bankrupt_or_Foreclose']
+    input_categorical_ohe = pd.get_dummies(input_df[categorical_cols], drop_first=False)
 
-    # Predict
-    prediction = model.predict(df_input)[0]
-    proba = model.predict_proba(df_input)[0][1]
+# 3. Combine numerical + categorical
+    final_input = pd.concat([input_df[numerical_cols], input_categorical_ohe], axis=1)
 
-    # Display results
-    if prediction == 1:
-        st.success(f"Loan Approved ✅ (Probability: {proba:.2f})")
+# 4. Add any missing columns with zeros
+    for col in feature_columns:
+        if col not in final_input.columns:
+            final_input[col] = 0
+
+# 5. Reorder columns exactly as in training
+    final_input = final_input[feature_columns]
+
+# --- Make prediction ---
+    prediction = model.predict(final_input)
+    prediction_proba = model.predict_proba(final_input)[:, 1]
+
+    # Display
+    st.subheader("Prediction Results")
+    if prediction[0]==1:
+        st.success(f"Loan Approval: YES (Probability: {prediction_proba[0]:.2f})")
         st.balloons()
     else:
-        st.error(f"Loan Not Approved ❌ (Probability: {proba:.2f})")
+        st.error(f"Loan Approval: NO (Probability: {prediction_proba[0]:.2f})")
+
+    st.write("Note: Probability closer to 1 indicates higher likelihood of approval.")
