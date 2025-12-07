@@ -4,7 +4,8 @@ import streamlit as st
 import pickle
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler # Required to unpickle the scaler
+import sklearn
+#from sklearn.preprocessing import StandardScaler # Required to unpickle the scaler
 
 # Load the trained model, scaler, feature columns, imputation medians, and categorical options
 with open("/content/drive/MyDrive/BUS 458 Final/final_exam_model.pkl", "rb") as file:
