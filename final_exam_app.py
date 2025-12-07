@@ -7,6 +7,9 @@ import numpy as np
 with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
 
+# --- Columns expected by model ---
+feature_columns = model.feature_names_in_  # get columns from model itself
+
 # --- Streamlit UI ---
 st.title("Loan Approval Prediction")
 
@@ -50,7 +53,13 @@ if st.button("Predict Loan Approval"):
     df.replace([np.inf, -np.inf], 0, inplace=True)
 
     # One-hot encode categorical variables
-    df = pd.get_dummies(df, drop_first=True)
+    df = pd.get_dummies(df, drop_first=False)
+
+    # Add missing columns and reorder to match training
+    for col in feature_columns:
+        if col not in df.columns:
+            df[col] = 0
+    df = df[feature_columns]
 
     # Make prediction
     pred = model.predict(df)[0]
