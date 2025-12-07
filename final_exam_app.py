@@ -8,22 +8,14 @@ with open("final_exam_model.pkl", "rb") as file:
     model = pickle.load(file)
 
 # --- Define categorical options ---
-categorical_options = [
-    #"Reason": ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"],
-    #"Employment_Status": ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"],
-    #"Lender": ["Bank A", "Bank B", "Bank C", "Credit Union", "Other"],
-    #"Fico_Score_group": ["300-579", "580-669", "670-739", "740-799", "800-850"],
-    #"Employment_Sector": ["Private", "Government", "Non-Profit", "Self-Employed", "Other"]
-    'Reason_Debt Consolidation', 'Reason_Home Improvement', 'Reason_Car Purchase', 'Reason_Medical', 'Reason_Other',
-    'Employment_Status_Employed', 'Employment_Status_Self-Employed', 'Employment_Status_Unemployed',
-    'Employment_Status_Student', 'Employment_Status_Retired',
-    'Lender_Bank A', 'Lender_Bank B', 'Lender_Bank C', 'Lender_Credit Union', 'Lender_Other',
-    'Fico_Score_group_300-579', 'Fico_Score_group_580-669', 'Fico_Score_group_670-739',
-    'Fico_Score_group_740-799', 'Fico_Score_group_800-850',
-    'Employment_Sector_Private', 'Employment_Sector_Government', 'Employment_Sector_Non-Profit',
-    'Employment_Sector_Self-Employed', 'Employment_Sector_Other',
-    'Ever_Bankrupt_or_Foreclose_0', 'Ever_Bankrupt_or_Foreclose_1'
-]
+categorical_options = categorical_options = {
+    "Reason": ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"],
+    "Employment_Status": ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"],
+    "Lender": ["Bank A", "Bank B", "Bank C", "Credit Union", "Other"],
+    "Fico_Score_group": ["300-579", "580-669", "670-739", "740-799", "800-850"],
+    "Employment_Sector": ["Private", "Government", "Non-Profit", "Self-Employed", "Other"]
+}
+
 
 # --- Define columns ---
 numerical_cols = [
@@ -72,7 +64,8 @@ employment_status = st.selectbox("Employment Status", categorical_options['Emplo
 lender = st.selectbox("Lender", categorical_options['Lender'])
 fico_score_group = st.selectbox("FICO Score Group", categorical_options['Fico_Score_group'])
 employment_sector = st.selectbox("Employment Sector", categorical_options['Employment_Sector'])
-ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0,1], format_func=lambda x: "Yes" if x==1 else "No")
+ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1],
+                                         format_func=lambda x: "Yes" if x == 1 else "No")
 
 # --- Prediction button ---
 if st.button("Predict Loan Approval"):
