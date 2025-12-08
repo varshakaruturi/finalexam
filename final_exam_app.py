@@ -63,10 +63,10 @@ if st.button("Predict Loan Approval"):
         
         # 2. Binary Prediction
         # Converts probability to 0 or 1 using the 0.5 threshold
-        prediction = (prediction_proba >= 0.5).astype(int)
+        pred = (prediction_proba >= 0.5).astype(int)
         
         # 3. Display Results
-        if prediction == 1:
+        if pred == 1:
             st.success(f"Loan Approved — Probability: {prediction_proba:.2f}")
             st.balloons()
         else:
