@@ -36,14 +36,12 @@ if st.button("Predict Loan Approval"):
         'FICO_score': [fico_score],
         'Monthly_Gross_Income': [monthly_gross_income],
         'Monthly_Housing_Payment': [monthly_housing_payment],
+        'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose],
         'Reason': [reason],
         'Employment_Status': [employment_status],
-        'Lender': [lender],
         'Employment_Sector': [employment_sector],
-        'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
+        'Lender': [lender]
     })
-    
-    df.replace([np.inf, -np.inf], 0, inplace=True)
 
     # --- 3. ONE-HOT ENCODING (Defines 'df_encoded') ---
     # Create the df_encoded variable here
