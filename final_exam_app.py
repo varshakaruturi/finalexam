@@ -30,25 +30,29 @@ ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], 
 
 # predict
 if st.button("Predict Loan Approval"):
-    df = pd.DataFrame({
-        'applications': [applications],
-        'Granted_Loan_Amount': [granted_loan_amount],
-        'Requested_Loan_Amount': [requested_loan_amount],
-        'FICO_score': [fico_score],
-        'Monthly_Gross_Income': [monthly_gross_income],
-        'Monthly_Housing_Payment': [monthly_housing_payment],
-        'Reason': [reason],
-        'Employment_Status': [employment_status],
-        'Lender': [lender],
-        'Fico_Score_group': [fico_score_group],
-        'Employment_Sector': [employment_sector],
-        'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
-    })
+    # The definitive list of features the model expects
+    feature_columns = [
+        'Granted_Loan_Amount', 'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
+        'Ever_Bankrupt_or_Foreclose',
+        'Reason_credit_card_refinancing', 'Reason_debt_conslidation', 'Reason_home_improvement',
+        'Reason_major_purchase', 'Reason_other',
+        'Employment_Status_part_time', 'Employment_Status_unemployed',
+        'Employment_Sector_energy', 'Employment_Sector_finance', 'Employment_Sector_healthcare',
+        'Employment_Sector_industrials', 'Employment_Sector_information_technology',
+        'Employment_Sector_materials', 'Employment_Sector_real_estate', 'Employment_Sector_retail',
+        'Employment_Sector_utilities', 'Employment_Sector_Unknown',
+        'Lender_B', 'Lender_C'
+    ]
+    
+    # 1. Add Missing Columns (Set to 0)
+    # This handles cases where a category was not selected in the form.
+    for col in feature_columns:
+        if col not in df_encoded.columns:
+            df_encoded[col] = 0
 
-    df['granted_requested_ratio'] = df['Granted_Loan_Amount'] / df['Requested_Loan_Amount']
-    df['housing_to_income_ratio'] = df['Monthly_Housing_Payment'] / df['Monthly_Gross_Income']
-    df.replace([np.inf, -np.inf], 0, inplace=True)
-
+    # 2. Final Alignment and Reordering (The Critical Fix for ValueError)
+    # This ensures only the expected columns are kept, and they are in the exact order.
+    df = df_encoded[feature_columns]
     # One-hot encode categorical variables
     df = pd.get_dummies(df, drop_first=False)
 
