@@ -32,9 +32,7 @@ ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], 
 if st.button("Predict Loan Approval"):
     # --- 1. CREATE INITIAL DATAFRAME (Defines 'df') ---
     df = pd.DataFrame({
-        'applications': [applications],
         'Granted_Loan_Amount': [granted_loan_amount],
-        'Requested_Loan_Amount': [requested_loan_amount],
         'FICO_score': [fico_score],
         'Monthly_Gross_Income': [monthly_gross_income],
         'Monthly_Housing_Payment': [monthly_housing_payment],
