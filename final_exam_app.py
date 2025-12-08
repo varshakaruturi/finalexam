@@ -68,8 +68,8 @@ st.write("MISSING MODEL COLS (in app):", [c for c in feature_columns if c not in
 st.write("EXTRA APP COLS (not in model):", [c for c in df.columns if c not in feature_columns][:30])
 
     # prediction
-    pred = model.predict(df)[0]
-    proba = model.predict_proba(df)[0][1]
+pred = model.predict(df)[0]
+proba = model.predict_proba(df)[0][1]
 
     # print result
     if pred == 1:
