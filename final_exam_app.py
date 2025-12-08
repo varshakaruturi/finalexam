@@ -58,10 +58,10 @@ if st.button("Predict Loan Approval"):
             df[col] = 0
             df = df[feature_columns]
 
-        else:
+        elif:
              st.success("Loan Approved")
              st.balloons()
-         else:
+        else:
             if proba is not None:
                 st.error(f"Loan Not Approved — Probability: {proba:.2f}")
             else:
