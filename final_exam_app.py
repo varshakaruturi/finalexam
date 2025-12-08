@@ -58,14 +58,6 @@ if st.button("Predict Loan Approval"):
             df[col] = 0
     df = df[feature_columns]
     
-st.write("MODEL FEATURES (len):", len(feature_columns))
-st.write("MODEL FEATURES sample:", list(feature_columns)[:30])
-st.write("APP PREPROCESS HEAD:")
-st.write(df.head())
-st.write("APP PREPROCESS COLUMNS (len):", len(df.columns))
-st.write("APP PREPROCESS COLUMNS sample:", list(df.columns)[:50])
-st.write("MISSING MODEL COLS (in app):", [c for c in feature_columns if c not in df.columns][:30])
-st.write("EXTRA APP COLS (not in model):", [c for c in df.columns if c not in feature_columns][:30])
 
     # prediction
 pred = model.predict(df)[0]
