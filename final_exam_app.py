@@ -70,8 +70,8 @@ if st.button("Predict Loan Approval"):
         st.write("Exception:", str(e))
         st.text(traceback.format_exc())
     # print result
-if pred == 1:
-    st.success(f"Loan Approved - (Probability: {proba:.2f})")
-    st.balloons()
-else:
-    st.error(f"Loan Not Approved - (Probability: {proba:.2f})")
+    if pred == 1:
+        st.success(f"Loan Approved - (Probability: {proba:.2f})")
+        st.balloons()
+    else:
+        st.error(f"Loan Not Approved - (Probability: {proba:.2f})")
