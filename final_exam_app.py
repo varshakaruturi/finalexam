@@ -52,16 +52,82 @@ if st.button("Predict Loan Approval"):
     # One-hot encode categorical variables
     df = pd.get_dummies(df, drop_first=False)
 
-    # Add missing columns and reorder to match training
-    for col in feature_columns:
-        if col not in df.columns:
-            df[col] = 0
-    df = df[feature_columns]
-    
+import traceback
 
-    # prediction
-pred = model.predict(df)[0]
-proba = model.predict_proba(df)[0][1]
+# --- ensure model is loaded ---
+if 'model' not in globals():
+    st.error("Model not loaded. Make sure the top of this file loads final_exam_model.pkl into variable `model`.")
+else:
+    try:
+        # 'df' should have been created above from the form values
+        # (if you used a different variable name, change 'df' below accordingly)
+        if 'df' not in locals() and 'df' not in globals():
+            st.error("Input DataFrame 'df' is not present. Make sure you create 'df' before predicting.")
+        else:
+            # get the created df variable
+            X_raw = df.copy()
+
+            # derive engineered features (if not already created)
+            if 'granted_requested_ratio' not in X_raw.columns:
+                X_raw['granted_requested_ratio'] = X_raw['Granted_Loan_Amount'] / X_raw['Requested_Loan_Amount']
+            if 'housing_to_income_ratio' not in X_raw.columns:
+                # avoid division by zero
+                X_raw['Monthly_Gross_Income'] = X_raw['Monthly_Gross_Income'].replace(0, 1e-6)
+                X_raw['housing_to_income_ratio'] = X_raw['Monthly_Housing_Payment'] / X_raw['Monthly_Gross_Income']
+
+            # convert infinite to zero
+            X_raw.replace([np.inf, -np.inf], 0, inplace=True)
+
+            # create dummies like you did (temporary)
+            X_enc = pd.get_dummies(X_raw, drop_first=False)
+
+            # fetch expected feature order from model
+            # try common attribute names; fallback to saved list if available
+            if hasattr(model, 'feature_names_in_'):
+                feature_columns = model.feature_names_in_
+            elif hasattr(model, 'named_steps') and 'model' in model.named_steps and hasattr(model.named_steps['model'], 'feature_names_in_'):
+                feature_columns = model.named_steps['model'].feature_names_in_
+            else:
+                # If you previously saved feature list separately, load it or define it here
+                st.warning("Model does not expose `feature_names_in_`. Ensure you saved feature list with the model.")
+                feature_columns = list(X_enc.columns)  # best-effort fallback
+
+            # Align columns safely (add missing, drop extras)
+            X_aligned = X_enc.reindex(columns=feature_columns, fill_value=0)
+
+            # quick debug (comment out in production)
+            st.write("DEBUG: model expects", len(feature_columns), "features")
+            st.write("DEBUG: X_enc columns (sample)", list(X_enc.columns)[:20])
+            st.write("DEBUG: missing columns (app -> model):", [c for c in feature_columns if c not in X_enc.columns][:20])
+            st.write("DEBUG: extra app cols (not in model):", [c for c in X_enc.columns if c not in feature_columns][:20])
+            st.write("DEBUG: X_aligned head:")
+            st.write(X_aligned.head())
+
+            # Predictions
+            pred = model.predict(X_aligned)[0]
+            # some models do not have predict_proba; guard it
+            if hasattr(model, 'predict_proba'):
+                proba = model.predict_proba(X_aligned)[0, 1]
+            else:
+                proba = None
+
+            # display results
+            if pred == 1:
+                if proba is not None:
+                    st.success(f"Loan Approved — Probability: {proba:.2f}")
+                else:
+                    st.success("Loan Approved")
+                st.balloons()
+            else:
+                if proba is not None:
+                    st.error(f"Loan Not Approved — Probability: {proba:.2f}")
+                else:
+                    st.error("Loan Not Approved")
+
+    except Exception as e:
+        st.error("Prediction failed — see debug below.")
+        st.write("Exception:", str(e))
+        st.text(traceback.format_exc())
 
     # print result
 if pred == 1:
