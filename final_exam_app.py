@@ -41,7 +41,6 @@ if st.button("Predict Loan Approval"):
         'Reason': [reason],
         'Employment_Status': [employment_status],
         'Lender': [lender],
-        'Fico_Score_group': [fico_score_group], # Note: this column name is not in feature_columns
         'Employment_Sector': [employment_sector],
         'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
     })
