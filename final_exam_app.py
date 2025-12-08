@@ -44,14 +44,7 @@ if st.button("Predict Loan Approval"):
         'Employment_Sector': [employment_sector],
         'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
     })
-
-    # --- 2. FEATURE ENGINEERING (Modifies 'df') ---
-    # Avoid division by zero
-    df['Requested_Loan_Amount'] = df['Requested_Loan_Amount'].replace(0, 1e-6)
-    df['Monthly_Gross_Income'] = df['Monthly_Gross_Income'].replace(0, 1e-6)
     
-    df['granted_requested_ratio'] = df['Granted_Loan_Amount'] / df['Requested_Loan_Amount']
-    df['housing_to_income_ratio'] = df['Monthly_Housing_Payment'] / df['Monthly_Gross_Income']
     df.replace([np.inf, -np.inf], 0, inplace=True)
 
     # --- 3. ONE-HOT ENCODING (Defines 'df_encoded') ---
