@@ -72,8 +72,8 @@ pred = model.predict(df)[0]
 proba = model.predict_proba(df)[0][1]
 
     # print result
-    if pred == 1:
-        st.success(f"Loan Approved - (Probability: {proba:.2f})")
-        st.balloons()
+if pred == 1:
+    st.success(f"Loan Approved - (Probability: {proba:.2f})")
+    st.balloons()
     else:
         st.error(f"Loan Not Approved - (Probability: {proba:.2f})")
