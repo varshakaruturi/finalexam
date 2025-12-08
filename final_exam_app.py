@@ -62,6 +62,8 @@ if st.button("Predict Loan Approval"):
     feature_columns = [
         'Granted_Loan_Amount', 'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
         'Ever_Bankrupt_or_Foreclose',
+        'granted_requested_ratio',  
+        'housing_to_income_ratio',
         'Reason_credit_card_refinancing', 'Reason_debt_conslidation', 'Reason_home_improvement',
         'Reason_major_purchase', 'Reason_other',
         'Employment_Status_part_time', 'Employment_Status_unemployed',
