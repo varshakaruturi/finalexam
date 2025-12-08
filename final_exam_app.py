@@ -47,7 +47,7 @@ if st.button("Predict Loan Approval"):
     # 1. Add Missing Columns (Set to 0)
     # This handles cases where a category was not selected in the form.
     for col in feature_columns:
-        if col not in feature_columns.columns:
+        if col not in df_encoded.columns:
             df_encoded[col] = 0
 
     # 2. Final Alignment and Reordering (The Critical Fix for ValueError)
