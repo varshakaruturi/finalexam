@@ -56,16 +56,16 @@ if st.button("Predict Loan Approval"):
     for col in feature_columns:
         if col not in df.columns:
             df[col] = 0
-    df = df[feature_columns]
+            df = df[feature_columns]
 
-     else:
-     st.success("Loan Approved")
-     st.balloons()
-     else:
-     if proba is not None:
-     st.error(f"Loan Not Approved — Probability: {proba:.2f}")
-    else:
-     st.error("Loan Not Approved")
+         else:
+             st.success("Loan Approved")
+             st.balloons()
+         else:
+            if proba is not None:
+                st.error(f"Loan Not Approved — Probability: {proba:.2f}")
+            else:
+                st.error("Loan Not Approved")
 
     except Exception as e:
         st.error("Prediction failed — see debug below.")
