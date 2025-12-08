@@ -30,6 +30,34 @@ ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], 
 
 # predict
 if st.button("Predict Loan Approval"):
+    # --- 1. CREATE INITIAL DATAFRAME (Defines 'df') ---
+    df = pd.DataFrame({
+        'applications': [applications],
+        'Granted_Loan_Amount': [granted_loan_amount],
+        'Requested_Loan_Amount': [requested_loan_amount],
+        'FICO_score': [fico_score],
+        'Monthly_Gross_Income': [monthly_gross_income],
+        'Monthly_Housing_Payment': [monthly_housing_payment],
+        'Reason': [reason],
+        'Employment_Status': [employment_status],
+        'Lender': [lender],
+        'Fico_Score_group': [fico_score_group], # Note: this column name is not in feature_columns
+        'Employment_Sector': [employment_sector],
+        'Ever_Bankrupt_or_Foreclose': [ever_bankrupt_or_foreclose]
+    })
+
+    # --- 2. FEATURE ENGINEERING (Modifies 'df') ---
+    # Avoid division by zero
+    df['Requested_Loan_Amount'] = df['Requested_Loan_Amount'].replace(0, 1e-6)
+    df['Monthly_Gross_Income'] = df['Monthly_Gross_Income'].replace(0, 1e-6)
+    
+    df['granted_requested_ratio'] = df['Granted_Loan_Amount'] / df['Requested_Loan_Amount']
+    df['housing_to_income_ratio'] = df['Monthly_Housing_Payment'] / df['Monthly_Gross_Income']
+    df.replace([np.inf, -np.inf], 0, inplace=True)
+
+    # --- 3. ONE-HOT ENCODING (Defines 'df_encoded') ---
+    # Create the df_encoded variable here
+    df_encoded = pd.get_dummies(df, drop_first=False)
     # The definitive list of features the model expects
     feature_columns = [
         'Granted_Loan_Amount', 'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
