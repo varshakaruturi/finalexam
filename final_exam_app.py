@@ -52,13 +52,17 @@ if st.button("Predict Loan Approval"):
     # One-hot encode categorical variables
     df = pd.get_dummies(df, drop_first=False)
 
+    # Use the aligned and encoded data for prediction
+    prediction_proba = model.predict_proba(input_data)[:, 1]
+    prediction = (prediction_proba >= 0.5).astype(int) # Using the 0.5 threshold
+
     # Add missing columns and reorder to match training
     for col in feature_columns:
         if col not in df.columns:
             df[col] = 0
             df = df[feature_columns]
 
-        elif:
+        elif prediction == 1:
              st.success("Loan Approved")
              st.balloons()
         else:
