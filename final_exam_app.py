@@ -54,16 +54,9 @@ if st.button("Predict Loan Approval"):
 
     # Use the aligned and encoded data for prediction
     prediction_proba = model.predict_proba(input_data)[:, 1]
-    prediction = (prediction_proba >= 0.5).astype(int) # Using the 0.5 threshold
+    pred = (prediction_proba >= 0.5).astype(int) # Using the 0.5 threshold
 
     try:
-        # 1. Prediction Probability
-        # Gets the probability score for the positive class (index 1)
-        prediction_proba = model.predict_proba(df)[:, 1][0]
-        
-        # 2. Binary Prediction
-        # Converts probability to 0 or 1 using the 0.5 threshold
-        pred = (prediction_proba >= 0.5).astype(int)
         
         # 3. Display Results
         if pred == 1:
