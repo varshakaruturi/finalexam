@@ -12,21 +12,33 @@ feature_columns = model.feature_names_in_
 # title
 st.title("Loan Approval Prediction")
 
-# Numerical inputs
-applications = st.number_input("Applications", 1, 10, 1)
+# Model feature columns
+feature_columns = [
+    'Granted_Loan_Amount', 'FICO_score', 'Monthly_Gross_Income', 'Monthly_Housing_Payment',
+    'Ever_Bankrupt_or_Foreclose',
+    'Reason_credit_card_refinancing', 'Reason_debt_conslidation', 'Reason_home_improvement',
+    'Reason_major_purchase', 'Reason_other',
+    'Employment_Status_part_time', 'Employment_Status_unemployed',
+    'Employment_Sector_energy', 'Employment_Sector_finance', 'Employment_Sector_healthcare',
+    'Employment_Sector_industrials', 'Employment_Sector_information_technology',
+    'Employment_Sector_materials', 'Employment_Sector_real_estate', 'Employment_Sector_retail',
+    'Employment_Sector_utilities', 'Employment_Sector_Unknown',
+    'Lender_B', 'Lender_C'
+]
+
+# --- Streamlit Inputs ---
 granted_loan_amount = st.number_input("Granted Loan Amount", 5000, 2000000, 50000, step=1000)
-requested_loan_amount = st.number_input("Requested Loan Amount", 5000, 2500000, 60000, step=1000)
 fico_score = st.number_input("FICO Score", 300, 850, 650)
 monthly_gross_income = st.number_input("Monthly Gross Income", 0, 20000, 5000)
 monthly_housing_payment = st.number_input("Monthly Housing Payment", 300, 50000, 1500)
-
-# Categorical inputs
-reason = st.selectbox("Reason", ["Debt Consolidation", "Home Improvement", "Car Purchase", "Medical", "Other"])
-employment_status = st.selectbox("Employment Status", ["Employed", "Self-Employed", "Unemployed", "Student", "Retired"])
-lender = st.selectbox("Lender", ["Bank A", "Bank B", "Bank C", "Credit Union", "Other"])
-fico_score_group = st.selectbox("FICO Score Group", ["300-579", "580-669", "670-739", "740-799", "800-850"])
-employment_sector = st.selectbox("Employment Sector", ["Private", "Government", "Non-Profit", "Self-Employed", "Other"])
 ever_bankrupt_or_foreclose = st.selectbox("Ever Bankrupt or Foreclose", [0, 1], format_func=lambda x: "Yes" if x else "No")
+reason = st.selectbox("Reason", ["Debt Consolidation", "Home Improvement", "Major Purchase", "Credit Card Refinancing", "Other"])
+employment_status = st.selectbox("Employment Status", ["Part-Time", "Unemployed", "Employed"])
+employment_sector = st.selectbox("Employment Sector", ["Energy", "Finance", "Healthcare", "Industrials",
+                                                       "Information Technology", "Materials", "Real Estate",
+                                                       "Retail", "Utilities", "Unknown"])
+lender = st.selectbox("Lender", ["B", "C", "Other"])
+
 
 # predict
 if st.button("Predict Loan Approval"):
