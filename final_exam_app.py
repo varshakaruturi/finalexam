@@ -58,7 +58,7 @@ if st.button("Predict Loan Approval"):
             df[col] = 0
             df = df[feature_columns]
 
-         else:
+        else:
              st.success("Loan Approved")
              st.balloons()
          else:
