@@ -56,20 +56,21 @@ if st.button("Predict Loan Approval"):
     prediction_proba = model.predict_proba(input_data)[:, 1]
     prediction = (prediction_proba >= 0.5).astype(int) # Using the 0.5 threshold
 
-    # Add missing columns and reorder to match training
-    for col in feature_columns:
-        if col not in df.columns:
-            df[col] = 0
-            df = df[feature_columns]
-
-        elif prediction == 1:
-             st.success("Loan Approved")
-             st.balloons()
-        else:
-            if proba is not None:
-                st.error(f"Loan Not Approved — Probability: {proba:.2f}")
-            else:
-                st.error("Loan Not Approved")
+    try:
+    # 1. Prediction Probability
+    # Gets the probability score for the positive class (index 1)
+    prediction_proba = model.predict_proba(df)[:, 1][0]
+    
+    # 2. Binary Prediction
+    # Converts probability to 0 or 1 using the 0.5 threshold
+    prediction = (prediction_proba >= 0.5).astype(int)
+    
+    # 3. Display Results
+    if prediction == 1:
+        st.success(f"Loan Approved — Probability: {prediction_proba:.2f}")
+        st.balloons()
+    else:
+        st.error(f"Loan Not Approved — Probability: {prediction_proba:.2f}")
 
     except Exception as e:
         st.error("Prediction failed — see debug below.")
