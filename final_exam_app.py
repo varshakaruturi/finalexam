@@ -53,7 +53,7 @@ if st.button("Predict Loan Approval"):
     df = pd.get_dummies(df, drop_first=False)
 
     # Use the aligned and encoded data for prediction
-    prediction_proba = model.predict_proba(input_data)[:, 1]
+    prediction_proba = model.predict_proba(df)[:, 1]
     pred = (prediction_proba >= 0.5).astype(int) # Using the 0.5 threshold
 
     try:
