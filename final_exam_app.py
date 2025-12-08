@@ -53,65 +53,79 @@ if st.button("Predict Loan Approval"):
     df = pd.get_dummies(df, drop_first=False)
 
 import traceback
+import pandas as pd
+import numpy as np  # <-- FIX: NumPy must be imported if you use np.inf
 
 # --- ensure model is loaded ---
 if 'model' not in globals():
+    # If this is run in a cell/script where 'model' isn't loaded higher up
+    # you might need to load it here (e.g., model = pd.read_pickle('final_exam_model.pkl'))
     st.error("Model not loaded. Make sure the top of this file loads final_exam_model.pkl into variable `model`.")
 else:
     try:
-        # 'df' should have been created above from the form values
-        # (if you used a different variable name, change 'df' below accordingly)
+        # Assuming 'df' (the input DataFrame from Streamlit form) is defined just before this block
         if 'df' not in locals() and 'df' not in globals():
             st.error("Input DataFrame 'df' is not present. Make sure you create 'df' before predicting.")
         else:
-            # get the created df variable
             X_raw = df.copy()
 
-            # derive engineered features (if not already created)
-            if 'granted_requested_ratio' not in X_raw.columns:
-                X_raw['granted_requested_ratio'] = X_raw['Granted_Loan_Amount'] / X_raw['Requested_Loan_Amount']
-            if 'housing_to_income_ratio' not in X_raw.columns:
-                # avoid division by zero
-                X_raw['Monthly_Gross_Income'] = X_raw['Monthly_Gross_Income'].replace(0, 1e-6)
-                X_raw['housing_to_income_ratio'] = X_raw['Monthly_Housing_Payment'] / X_raw['Monthly_Gross_Income']
+            # --- Feature Engineering (Check for required columns) ---
+            if 'Granted_Loan_Amount' in X_raw.columns and 'Requested_Loan_Amount' in X_raw.columns:
+                if 'granted_requested_ratio' not in X_raw.columns:
+                    # Avoid division by zero
+                    X_raw['Requested_Loan_Amount'] = X_raw['Requested_Loan_Amount'].replace(0, 1e-6)
+                    X_raw['granted_requested_ratio'] = X_raw['Granted_Loan_Amount'] / X_raw['Requested_Loan_Amount']
+            
+            if 'Monthly_Housing_Payment' in X_raw.columns and 'Monthly_Gross_Income' in X_raw.columns:
+                if 'housing_to_income_ratio' not in X_raw.columns:
+                    # avoid division by zero
+                    X_raw['Monthly_Gross_Income'] = X_raw['Monthly_Gross_Income'].replace(0, 1e-6)
+                    X_raw['housing_to_income_ratio'] = X_raw['Monthly_Housing_Payment'] / X_raw['Monthly_Gross_Income']
 
             # convert infinite to zero
             X_raw.replace([np.inf, -np.inf], 0, inplace=True)
 
-            # create dummies like you did (temporary)
+            # --- Encoding ---
+            # NOTE: pd.get_dummies needs to be robustly applied ONLY to the categorical columns
+            # For simplicity, we keep your current implementation, assuming non-numeric columns are categorical.
             X_enc = pd.get_dummies(X_raw, drop_first=False)
 
-            # fetch expected feature order from model
-            # try common attribute names; fallback to saved list if available
+            # --- Feature Alignment ---
+            feature_columns = None
             if hasattr(model, 'feature_names_in_'):
                 feature_columns = model.feature_names_in_
             elif hasattr(model, 'named_steps') and 'model' in model.named_steps and hasattr(model.named_steps['model'], 'feature_names_in_'):
+                # Check for models inside scikit-learn pipelines
                 feature_columns = model.named_steps['model'].feature_names_in_
             else:
-                # If you previously saved feature list separately, load it or define it here
-                st.warning("Model does not expose `feature_names_in_`. Ensure you saved feature list with the model.")
-                feature_columns = list(X_enc.columns)  # best-effort fallback
+                # Fallback: relies on a pre-saved list, which is the most robust method
+                st.warning("Model does not expose `feature_names_in_`. Using best-effort fallback.")
+                # You should load a saved feature list here if possible, e.g.,
+                # feature_columns = load_feature_list_from_file()
+                feature_columns = list(X_enc.columns) # Fallback is risky
 
-            # Align columns safely (add missing, drop extras)
+            if feature_columns is None:
+                 st.error("Cannot determine expected feature list. Prediction halted.")
+                 return # Stop execution if features are unknown
+
+            # Align columns safely (add missing, drop extras, and maintain order)
             X_aligned = X_enc.reindex(columns=feature_columns, fill_value=0)
 
             # quick debug (comment out in production)
             st.write("DEBUG: model expects", len(feature_columns), "features")
-            st.write("DEBUG: X_enc columns (sample)", list(X_enc.columns)[:20])
-            st.write("DEBUG: missing columns (app -> model):", [c for c in feature_columns if c not in X_enc.columns][:20])
-            st.write("DEBUG: extra app cols (not in model):", [c for c in X_enc.columns if c not in feature_columns][:20])
-            st.write("DEBUG: X_aligned head:")
-            st.write(X_aligned.head())
+            st.write("DEBUG: X_aligned shape:", X_aligned.shape)
 
-            # Predictions
+            # --- Predictions ---
+            # Ensure X_aligned has only one row if the input 'df' was a single user input
             pred = model.predict(X_aligned)[0]
+            
             # some models do not have predict_proba; guard it
+            proba = None
             if hasattr(model, 'predict_proba'):
+                # Assumes the positive class (approved) is at index 1
                 proba = model.predict_proba(X_aligned)[0, 1]
-            else:
-                proba = None
 
-            # display results
+            # --- display results ---
             if pred == 1:
                 if proba is not None:
                     st.success(f"Loan Approved — Probability: {proba:.2f}")
@@ -128,7 +142,6 @@ else:
         st.error("Prediction failed — see debug below.")
         st.write("Exception:", str(e))
         st.text(traceback.format_exc())
-
     # print result
 if pred == 1:
     st.success(f"Loan Approved - (Probability: {proba:.2f})")
